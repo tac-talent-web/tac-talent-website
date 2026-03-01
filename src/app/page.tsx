@@ -329,7 +329,7 @@ export default function TACHomepage() {
             <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Onze consultants maken het verschil.</h2>
             <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65 }}>Bij TAC werkt u samen met ervaren consultants die de technische arbeidsmarkt van binnen en buiten kennen. Zij zijn uw vaste aanspreekpunt — van intake tot plaatsing en daarna.</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 28 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 28 }}>
             {[
               {
                 name: "Sophie van den Berg",
@@ -348,6 +348,12 @@ export default function TACHomepage() {
                 title: "Consultant Advies",
                 bio: "Lena combineert marktdata met praktijkervaring om opdrachtgevers eerlijk advies te geven. Zij helpt ook bij het schrijven van vacatureteksten die wél de juiste kandidaten trekken.",
                 img: "/consultant-lena.webp",
+              },
+              {
+                name: "Lisa Clawton",
+                title: "Recruitment Consultant",
+                bio: "Lisa is gespecialiseerd in het vinden van jong technisch talent voor groeiende organisaties. Met haar scherpe marktkennis en directe aanpak zorgt zij voor snelle en passende matches.",
+                img: "/consultant-lisa.webp",
               },
             ].map((c, i) => (
               <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "32px 24px", border: `1px solid ${C.gainsboro}`, borderRadius: 14 }}>
