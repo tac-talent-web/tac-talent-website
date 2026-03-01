@@ -151,18 +151,18 @@ export default function TACHomepage() {
             <div style={{ order: isMobile ? 1 : 0 }}>
               <Label>Werving &amp; Selectie</Label>
               <h1 style={{ fontFamily: F.h, fontSize: isMobile ? 36 : isTablet ? 50 : 64, fontWeight: 800, color: C.white, lineHeight: 1.0, letterSpacing: "-0.035em", margin: "0 0 24px" }}>Technisch talent<br />dat bij u past.</h1>
-              <p style={{ fontFamily: F.b, fontSize: isMobile ? 15 : 18, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, maxWidth: 480, margin: "0 0 36px" }}>TAC is specialist in het vinden van technisch personeel. Wij combineren sectorkennis met slimme technologie om snel de juiste match te maken. Zonder risico — u betaalt alleen bij een succesvolle plaatsing.</p>
+              <p style={{ fontFamily: F.b, fontSize: isMobile ? 15 : 18, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, maxWidth: 480, margin: "0 0 36px" }}>TAC is specialist in het vinden van technisch personeel. Wij combineren sectorkennis met slimme technologie om snel de juiste match te maken. Zonder risico â€” u betaalt alleen bij een succesvolle plaatsing.</p>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                 <Btn variant="primary">Ontdek onze aanpak</Btn>
                 <Btn variant="outline_light">Neem contact op</Btn>
               </div>
             </div>
             <div style={{ order: isMobile ? 0 : 1 }}>
-              <Photo aspect={isMobile ? "16/9" : "4/5"} src="/hero.png" label="Consultant in gesprek met opdrachtgever" />
+              <Photo aspect={isMobile ? "16/9" : "4/5"} src="/hero.webp" label="Consultant in gesprek met opdrachtgever" />
             </div>
           </div>
 
-          {/* STATS — 2×2 on mobile, 4 col on desktop */}
+          {/* STATS â€” 2Ã—2 on mobile, 4 col on desktop */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: isMobile ? "28px 20px" : 64, padding: "52px 0 60px", borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 56 }}>
             {[{ n: "90", l: "dagen garantie" }, { n: "No cure", l: "no pay" }, { n: "< 5", l: "werkdagen tot voordracht" }, { n: "100%", l: "focus op technisch talent" }].map((s, i) => (
               <div key={i}>
@@ -186,18 +186,18 @@ export default function TACHomepage() {
         </div>
       </div>
 
-      {/* DIENSTEN — 1 col mobile, 2 col tablet, 3 col desktop */}
+      {/* DIENSTEN â€” 1 col mobile, 2 col tablet, 3 col desktop */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: secPad }}>
         <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 64px" }}>
           <Label>Onze diensten</Label>
           <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>De juiste expertise voor elk wervingsvraagstuk.</h2>
-          <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65 }}>Of u nu één positie wilt invullen of structureel zoekt naar technisch personeel — wij bieden de oplossing die past bij uw situatie.</p>
+          <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65 }}>Of u nu Ã©Ã©n positie wilt invullen of structureel zoekt naar technisch personeel â€” wij bieden de oplossing die past bij uw situatie.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap: 24 }}>
           {[
-            { title: "Werving & Selectie", desc: "Zoekt u een ervaren technisch professional voor een vaste positie? Onze consultants kennen de markt en weten waar het juiste talent te vinden is.", points: ["Persoonlijke intake en vacature-analyse", "Gescreende kandidaten binnen werkdagen", "90 dagen plaatsingsgarantie"], photo: "Kandidaat op de werkvloer", img: "/service1.png" },
-            { title: "Interim & Tijdelijke Inzet", desc: "Heeft u op korte termijn extra capaciteit nodig? Wij beschikken over een netwerk van direct beschikbare professionals die snel inzetbaar zijn.", points: ["Direct beschikbare vakmensen", "Flexibele contractvormen", "Persoonlijke begeleiding gedurende de opdracht"], photo: "Professional aan het werk", img: "/service2.png" },
-            { title: "Advies & Marktinzicht", desc: "Niet zeker waar te beginnen? Onze consultants adviseren u over de huidige arbeidsmarkt, realistische verwachtingen en de beste aanpak.", points: ["Arbeidsmarktanalyse voor uw regio", "Salarisadvies op basis van actuele data", "Advies over vacaturetekst en positionering"], photo: "Consultant geeft advies", img: "/team.png" },
+            { title: "Werving & Selectie", desc: "Zoekt u een ervaren technisch professional voor een vaste positie? Onze consultants kennen de markt en weten waar het juiste talent te vinden is.", points: ["Persoonlijke intake en vacature-analyse", "Gescreende kandidaten binnen werkdagen", "90 dagen plaatsingsgarantie"], photo: "Kandidaat op de werkvloer", img: "/service1.webp" },
+            { title: "Interim & Tijdelijke Inzet", desc: "Heeft u op korte termijn extra capaciteit nodig? Wij beschikken over een netwerk van direct beschikbare professionals die snel inzetbaar zijn.", points: ["Direct beschikbare vakmensen", "Flexibele contractvormen", "Persoonlijke begeleiding gedurende de opdracht"], photo: "Professional aan het werk", img: "/service2.webp" },
+            { title: "Advies & Marktinzicht", desc: "Niet zeker waar te beginnen? Onze consultants adviseren u over de huidige arbeidsmarkt, realistische verwachtingen en de beste aanpak.", points: ["Arbeidsmarktanalyse voor uw regio", "Salarisadvies op basis van actuele data", "Advies over vacaturetekst en positionering"], photo: "Consultant geeft advies", img: "/team.webp" },
           ].map((d, i) => (
             <div key={i} style={{ border: `1px solid ${C.gainsboro}`, borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
               <Photo aspect="16/10" src={d.img} label={d.photo} style={{ borderRadius: 0 }} />
@@ -218,7 +218,7 @@ export default function TACHomepage() {
         </div>
       </div>
 
-      {/* GARANTIE — stack on mobile */}
+      {/* GARANTIE â€” stack on mobile */}
       <div style={{ background: C.teal }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: secPad }}>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 80, alignItems: "center" }}>
@@ -237,7 +237,7 @@ export default function TACHomepage() {
                 <div key={i} style={{ padding: "22px 24px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
                     <div style={{ width: 28, height: 28, borderRadius: 7, background: C.sage, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <span style={{ color: C.teal, fontSize: 14, fontWeight: 800, lineHeight: 1 }}>✓</span>
+                      <span style={{ color: C.teal, fontSize: 14, fontWeight: 800, lineHeight: 1 }}>âœ“</span>
                     </div>
                     <div>
                       <div style={{ fontFamily: F.h, fontSize: 16, fontWeight: 700, color: C.white, marginBottom: 3 }}>{item.title}</div>
@@ -251,14 +251,14 @@ export default function TACHomepage() {
         </div>
       </div>
 
-      {/* CONTACT — stack on mobile */}
+      {/* CONTACT â€” stack on mobile */}
       <div style={{ background: C.offwhite }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: secPad }}>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 80, alignItems: "start" }}>
             <div>
               <Label>Neem contact op</Label>
               <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Samen kijken wat we voor u kunnen betekenen?</h2>
-              <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65, margin: "0 0 36px", maxWidth: 420 }}>Of u nu een concrete vacature heeft of gewoon wilt weten wat de mogelijkheden zijn — wij denken graag met u mee. Geheel vrijblijvend.</p>
+              <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65, margin: "0 0 36px", maxWidth: 420 }}>Of u nu een concrete vacature heeft of gewoon wilt weten wat de mogelijkheden zijn â€” wij denken graag met u mee. Geheel vrijblijvend.</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <div style={{ display: "flex", gap: 12 }}><span style={{ fontSize: 14, color: C.muted, width: 60 }}>Email</span><span style={{ fontSize: 15, color: C.licorice, fontWeight: 500 }}>info@tac-talent.nl</span></div>
                 <div style={{ display: "flex", gap: 12 }}><span style={{ fontSize: 14, color: C.muted, width: 60 }}>LinkedIn</span><span style={{ fontSize: 15, color: C.red, fontWeight: 500, cursor: "pointer" }}>linkedin.com/company/tac-talent</span></div>
@@ -277,13 +277,13 @@ export default function TACHomepage() {
                 <div style={{ width: "100%", padding: "13px 16px", borderRadius: 8, minHeight: 100, border: `1px solid ${C.gainsboro}`, background: C.offwhite, fontFamily: F.b, fontSize: 15, color: C.muted }}> Beschrijf kort uw situatie of vraag...</div>
               </div>
               <Btn variant="primary" style={{ width: "100%", justifyContent: "center" }}>Verstuur bericht</Btn>
-              <div style={{ fontSize: 12, color: C.muted, textAlign: "center", marginTop: 12 }}>Wij reageren binnen één werkdag.</div>
+              <div style={{ fontSize: 12, color: C.muted, textAlign: "center", marginTop: 12 }}>Wij reageren binnen Ã©Ã©n werkdag.</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* FOOTER — stack on mobile */}
+      {/* FOOTER â€” stack on mobile */}
       <div style={{ background: C.licorice }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "48px 20px" : "56px 48px" }}>
           <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 40, paddingBottom: 40, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -307,7 +307,7 @@ export default function TACHomepage() {
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", paddingTop: 28, gap: isMobile ? 12 : 0 }}>
-            <div style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)" }}>© 2026 TAC — Talent Acquisition Company</div>
+            <div style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)" }}>Â© 2026 TAC â€” Talent Acquisition Company</div>
             <div style={{ display: "flex", gap: 24 }}>
               <span style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)", cursor: "pointer" }}>Privacy</span>
             </div>
