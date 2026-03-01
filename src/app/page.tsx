@@ -42,15 +42,20 @@ function Btn({ children, variant = "primary", style: sx = {} }: { children: Reac
   return <button style={{ ...v[variant], ...sx }}>{children}</button>;
 }
 
-function Photo({ aspect = "3/2", label = "", dark = true, style: sx = {} }: { aspect?: string; label?: string; dark?: boolean; style?: React.CSSProperties }) {
+function Photo({ aspect = "3/2", src = "", label = "", dark = true, style: sx = {} }: { aspect?: string; src?: string; label?: string; dark?: boolean; style?: React.CSSProperties }) {
   const bg = dark
     ? "linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 40%, #1f1f1f 100%)"
     : "linear-gradient(145deg, #e8e8e6 0%, #d4d4d2 40%, #e0e0de 100%)";
   return (
     <div style={{ aspectRatio: aspect, background: bg, borderRadius: 12, position: "relative", overflow: "hidden", ...sx }}>
-      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        {label && <div style={{ fontFamily: F.h, fontSize: 11, fontWeight: 500, color: dark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.15)", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", padding: "0 20px" }}>{label}</div>}
-      </div>
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={label} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      ) : (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {label && <div style={{ fontFamily: F.h, fontSize: 11, fontWeight: 500, color: dark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.15)", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", padding: "0 20px" }}>{label}</div>}
+        </div>
+      )}
     </div>
   );
 }
@@ -93,7 +98,7 @@ export default function TACHomepage() {
                 <Btn variant="outline_light">Neem contact op</Btn>
               </div>
             </div>
-            <Photo aspect="4/5" label="Consultant in gesprek met opdrachtgever" />
+            <Photo aspect="4/5" src="/hero.png" label="Consultant in gesprek met opdrachtgever" />
           </div>
           <div style={{ display: "flex", gap: 64, padding: "52px 0 60px", borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 56 }}>
             {[{ n: "90", l: "dagen garantie" }, { n: "No cure", l: "no pay" }, { n: "< 5", l: "werkdagen tot voordracht" }, { n: "100%", l: "focus op technisch talent" }].map((s, i) => (
@@ -127,12 +132,12 @@ export default function TACHomepage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24 }}>
           {[
-            { title: "Werving & Selectie", desc: "Zoekt u een ervaren technisch professional voor een vaste positie? Onze consultants kennen de markt en weten waar het juiste talent te vinden is.", points: ["Persoonlijke intake en vacature-analyse", "Gescreende kandidaten binnen werkdagen", "90 dagen plaatsingsgarantie"], photo: "Kandidaat op de werkvloer" },
-            { title: "Interim & Tijdelijke Inzet", desc: "Heeft u op korte termijn extra capaciteit nodig? Wij beschikken over een netwerk van direct beschikbare professionals die snel inzetbaar zijn.", points: ["Direct beschikbare vakmensen", "Flexibele contractvormen", "Persoonlijke begeleiding gedurende de opdracht"], photo: "Professional aan het werk" },
-            { title: "Advies & Marktinzicht", desc: "Niet zeker waar te beginnen? Onze consultants adviseren u over de huidige arbeidsmarkt, realistische verwachtingen en de beste aanpak.", points: ["Arbeidsmarktanalyse voor uw regio", "Salarisadvies op basis van actuele data", "Advies over vacaturetekst en positionering"], photo: "Consultant geeft advies" },
+            { title: "Werving & Selectie", desc: "Zoekt u een ervaren technisch professional voor een vaste positie? Onze consultants kennen de markt en weten waar het juiste talent te vinden is.", points: ["Persoonlijke intake en vacature-analyse", "Gescreende kandidaten binnen werkdagen", "90 dagen plaatsingsgarantie"], photo: "Kandidaat op de werkvloer", img: "/service1.png" },
+            { title: "Interim & Tijdelijke Inzet", desc: "Heeft u op korte termijn extra capaciteit nodig? Wij beschikken over een netwerk van direct beschikbare professionals die snel inzetbaar zijn.", points: ["Direct beschikbare vakmensen", "Flexibele contractvormen", "Persoonlijke begeleiding gedurende de opdracht"], photo: "Professional aan het werk", img: "/service2.png" },
+            { title: "Advies & Marktinzicht", desc: "Niet zeker waar te beginnen? Onze consultants adviseren u over de huidige arbeidsmarkt, realistische verwachtingen en de beste aanpak.", points: ["Arbeidsmarktanalyse voor uw regio", "Salarisadvies op basis van actuele data", "Advies over vacaturetekst en positionering"], photo: "Consultant geeft advies", img: "/team.png" },
           ].map((d, i) => (
             <div key={i} style={{ border: `1px solid ${C.gainsboro}`, borderRadius: 14, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-              <Photo aspect="16/10" label={d.photo} style={{ borderRadius: 0 }} />
+              <Photo aspect="16/10" src={d.img} label={d.photo} style={{ borderRadius: 0 }} />
               <div style={{ padding: "28px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontFamily: F.h, fontSize: 22, fontWeight: 700, color: C.licorice, margin: "0 0 10px", lineHeight: 1.2 }}>{d.title}</h3>
                 <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, margin: "0 0 20px", flex: 1 }}>{d.desc}</p>
