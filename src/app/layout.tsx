@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "TAC — Talent Acquisition Company",
-  description: "Specialist in het vinden van technisch personeel. No cure, no pay. 90 dagen garantie.",
+  description: "Specialist in het vinden van technisch personeel. No cure, no pay. 30 dagen garantie.",
 };
 
 export default function RootLayout({
