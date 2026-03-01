@@ -39,25 +39,25 @@ function Label({ children }: { children: React.ReactNode }) {
 const CONSULTANTS = [
   {
     name: "Sophie van den Berg",
-    title: "Senior Consultant W&S",
+    title: "Manager Werving & Selectie",
     bio: "Sophie heeft 8 jaar ervaring in technische werving. Zij is gespecialiseerd in machinebouw en installatietechniek en staat bekend om haar directe communicatie.",
     img: "/consultant-sophie.webp",
   },
   {
     name: "Daan Hoekstra",
-    title: "Consultant Interim",
+    title: "Manager Interim",
     bio: "Daan werkt dagelijks met opdrachtgevers die snel iemand nodig hebben. Zijn netwerk van direct beschikbare technici maakt hem de aangewezen persoon voor urgente opdrachten.",
     img: "/consultant-daan.webp",
   },
   {
     name: "Lena Martens",
-    title: "Consultant Advies",
+    title: "Manager Advies & Marktinzicht",
     bio: "Lena combineert marktdata met praktijkervaring om opdrachtgevers eerlijk advies te geven. Zij helpt ook bij het schrijven van vacatureteksten die wél de juiste kandidaten trekken.",
     img: "/consultant-lena.webp",
   },
   {
     name: "Lisa Clawton",
-    title: "Recruitment Consultant",
+    title: "Manager Recruitment",
     bio: "Lisa is gespecialiseerd in het vinden van jong technisch talent voor groeiende organisaties. Met haar scherpe marktkennis en directe aanpak zorgt zij voor snelle en passende matches.",
     img: "/consultant-lisa.webp",
   },
