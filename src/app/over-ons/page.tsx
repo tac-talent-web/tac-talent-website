@@ -142,7 +142,7 @@ export default function OverOnsPage() {
             {CONSULTANTS.map((c, i) => (
               <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "32px 24px", border: `1px solid ${C.gainsboro}`, borderRadius: 14 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.img} alt={c.name} style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", objectPosition: "center top", borderRadius: 12, marginBottom: 20 }} />
+                <img src={c.img} alt={c.name} style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", objectPosition: "center 15%", borderRadius: 12, marginBottom: 20 }} />
                 <div style={{ fontFamily: F.h, fontSize: 18, fontWeight: 700, color: C.licorice, marginBottom: 4 }}>{c.name}</div>
                 <div style={{ fontFamily: F.b, fontSize: 13, color: C.muted, marginBottom: 16 }}>{c.title}</div>
                 <p style={{ fontFamily: F.b, fontSize: 14, color: C.muted, lineHeight: 1.65, margin: 0 }}>{c.bio}</p>
