@@ -18,6 +18,18 @@ const F = {
   b: "'Inter', system-ui, sans-serif",
 };
 
+function useWindowWidth() {
+  const [width, setWidth] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return width;
+}
+
 function Logo({ variant = "dark", size = "md" }: { variant?: string; size?: string }) {
   const s: Record<string, number> = { sm: 22, md: 26, lg: 34 };
   return (
@@ -62,48 +74,99 @@ function Photo({ aspect = "3/2", src = "", label = "", dark = true, style: sx = 
 
 export default function TACHomepage() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const width = useWindowWidth();
+
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  useEffect(() => {
+    if (!isMobile) setMenuOpen(false);
+  }, [isMobile]);
+
+  const navBg = scrolled || menuOpen ? "rgba(255,255,255,0.97)" : "transparent";
+  const navBlur = scrolled || menuOpen ? "blur(20px)" : "none";
+  const navBorder = scrolled && !menuOpen ? `1px solid ${C.gainsboro}` : "none";
+  const navPadding = isMobile
+    ? scrolled ? "14px 20px" : "20px 20px"
+    : scrolled ? "14px 48px" : "28px 48px";
+  const navTextDark = scrolled || menuOpen;
+  const barColor = navTextDark ? C.licorice : C.white;
+
+  const hPad = isMobile ? "0 20px" : "0 48px";
+  const secPad = isMobile ? "60px 20px" : isTablet ? "80px 32px" : "100px 48px";
+
   return (
     <div style={{ fontFamily: F.b, color: C.licorice, background: C.white, overflowX: "hidden" }}>
+
       {/* NAV */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? "rgba(255,255,255,0.97)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? `1px solid ${C.gainsboro}` : "none", transition: "all 0.35s ease", padding: scrolled ? "14px 48px" : "28px 48px" }}>
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: navBg, backdropFilter: navBlur, borderBottom: navBorder, transition: "all 0.35s ease", padding: navPadding }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Logo variant={scrolled ? "dark" : "light"} size="sm" />
-          <div style={{ display: "flex", gap: 36, alignItems: "center" }}>
-            {["Diensten", "Expertise", "Over ons", "Contact"].map(item => (
-              <a key={item} style={{ fontFamily: F.b, fontSize: 14, fontWeight: 500, color: scrolled ? C.licorice : "rgba(255,255,255,0.65)", textDecoration: "none", cursor: "pointer" }}>{item}</a>
-            ))}
-            <Btn variant="primary" style={{ padding: "10px 22px", fontSize: 13 }}>Neem contact op</Btn>
-          </div>
+          <Logo variant={navTextDark ? "dark" : "light"} size="sm" />
+
+          {isMobile ? (
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+              style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", gap: 5, flexShrink: 0 }}
+            >
+              <span style={{ display: "block", width: 22, height: 2, background: barColor, transition: "transform 0.3s ease, background 0.35s ease", transformOrigin: "center", transform: menuOpen ? "translateY(7px) rotate(45deg)" : "none" }} />
+              <span style={{ display: "block", width: 22, height: 2, background: barColor, transition: "opacity 0.3s ease, background 0.35s ease", opacity: menuOpen ? 0 : 1 }} />
+              <span style={{ display: "block", width: 22, height: 2, background: barColor, transition: "transform 0.3s ease, background 0.35s ease", transformOrigin: "center", transform: menuOpen ? "translateY(-7px) rotate(-45deg)" : "none" }} />
+            </button>
+          ) : (
+            <div style={{ display: "flex", gap: 36, alignItems: "center" }}>
+              {["Diensten", "Expertise", "Over ons", "Contact"].map(item => (
+                <a key={item} style={{ fontFamily: F.b, fontSize: 14, fontWeight: 500, color: scrolled ? C.licorice : "rgba(255,255,255,0.65)", textDecoration: "none", cursor: "pointer" }}>{item}</a>
+              ))}
+              <Btn variant="primary" style={{ padding: "10px 22px", fontSize: 13 }}>Neem contact op</Btn>
+            </div>
+          )}
         </div>
+
+        {isMobile && menuOpen && (
+          <div style={{ padding: "16px 20px 20px", borderTop: `1px solid ${C.gainsboro}`, marginTop: 12 }}>
+            {["Diensten", "Expertise", "Over ons", "Contact"].map(item => (
+              <a key={item} onClick={() => setMenuOpen(false)} style={{ display: "block", fontFamily: F.b, fontSize: 16, fontWeight: 500, color: C.licorice, textDecoration: "none", cursor: "pointer", padding: "12px 0", borderBottom: `1px solid ${C.gainsboro}` }}>{item}</a>
+            ))}
+            <div style={{ marginTop: 16 }}>
+              <Btn variant="primary" style={{ width: "100%", justifyContent: "center" }}>Neem contact op</Btn>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* HERO */}
       <div style={{ background: C.licorice, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, opacity: 0.02, backgroundImage: `linear-gradient(${C.gainsboro} 1px, transparent 1px), linear-gradient(90deg, ${C.gainsboro} 1px, transparent 1px)`, backgroundSize: "80px 80px" }} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: C.red }} />
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "160px 48px 0" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 72, alignItems: "center", minHeight: "65vh" }}>
-            <div>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "110px 20px 0" : isTablet ? "140px 32px 0" : "160px 48px 0" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 36 : 72, alignItems: "center", minHeight: isMobile ? "auto" : "65vh" }}>
+            <div style={{ order: isMobile ? 1 : 0 }}>
               <Label>Werving &amp; Selectie</Label>
-              <h1 style={{ fontFamily: F.h, fontSize: 64, fontWeight: 800, color: C.white, lineHeight: 1.0, letterSpacing: "-0.035em", margin: "0 0 24px" }}>Technisch talent<br />dat bij u past.</h1>
-              <p style={{ fontFamily: F.b, fontSize: 18, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, maxWidth: 480, margin: "0 0 36px" }}>TAC is specialist in het vinden van technisch personeel. Wij combineren sectorkennis met slimme technologie om snel de juiste match te maken. Zonder risico — u betaalt alleen bij een succesvolle plaatsing.</p>
-              <div style={{ display: "flex", gap: 14 }}>
+              <h1 style={{ fontFamily: F.h, fontSize: isMobile ? 36 : isTablet ? 50 : 64, fontWeight: 800, color: C.white, lineHeight: 1.0, letterSpacing: "-0.035em", margin: "0 0 24px" }}>Technisch talent<br />dat bij u past.</h1>
+              <p style={{ fontFamily: F.b, fontSize: isMobile ? 15 : 18, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, maxWidth: 480, margin: "0 0 36px" }}>TAC is specialist in het vinden van technisch personeel. Wij combineren sectorkennis met slimme technologie om snel de juiste match te maken. Zonder risico — u betaalt alleen bij een succesvolle plaatsing.</p>
+              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                 <Btn variant="primary">Ontdek onze aanpak</Btn>
                 <Btn variant="outline_light">Neem contact op</Btn>
               </div>
             </div>
-            <Photo aspect="4/5" src="/hero.png" label="Consultant in gesprek met opdrachtgever" />
+            <div style={{ order: isMobile ? 0 : 1 }}>
+              <Photo aspect={isMobile ? "16/9" : "4/5"} src="/hero.png" label="Consultant in gesprek met opdrachtgever" />
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 64, padding: "52px 0 60px", borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 56 }}>
+
+          {/* STATS — 2×2 on mobile, 4 col on desktop */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: isMobile ? "28px 20px" : 64, padding: "52px 0 60px", borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 56 }}>
             {[{ n: "90", l: "dagen garantie" }, { n: "No cure", l: "no pay" }, { n: "< 5", l: "werkdagen tot voordracht" }, { n: "100%", l: "focus op technisch talent" }].map((s, i) => (
               <div key={i}>
-                <div style={{ fontFamily: F.h, fontSize: 40, fontWeight: 800, color: C.white, lineHeight: 1 }}>{s.n}</div>
+                <div style={{ fontFamily: F.h, fontSize: isMobile ? 30 : 40, fontWeight: 800, color: C.white, lineHeight: 1 }}>{s.n}</div>
                 <div style={{ fontFamily: F.h, fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 8 }}>{s.l}</div>
               </div>
             ))}
@@ -112,25 +175,25 @@ export default function TACHomepage() {
       </div>
 
       {/* CLIENT LOGOS */}
-      <div style={{ borderBottom: `1px solid ${C.gainsboro}`, padding: "36px 48px" }}>
+      <div style={{ borderBottom: `1px solid ${C.gainsboro}`, padding: isMobile ? "28px 20px" : "36px 48px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ fontFamily: F.h, fontSize: 11, fontWeight: 500, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "center", marginBottom: 20 }}>Bedrijven die wij ondersteunen bij hun zoektocht naar technisch talent</div>
-          <div style={{ display: "flex", gap: 24, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: isMobile ? 8 : 24, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
             {["Bedrijf A", "Bedrijf B", "Bedrijf C", "Bedrijf D", "Bedrijf E", "Bedrijf F"].map(name => (
-              <div key={name} style={{ padding: "12px 28px", fontFamily: F.h, fontSize: 15, fontWeight: 700, color: C.gainsboro, letterSpacing: "-0.01em" }}>{name}</div>
+              <div key={name} style={{ padding: isMobile ? "8px 16px" : "12px 28px", fontFamily: F.h, fontSize: 15, fontWeight: 700, color: C.gainsboro, letterSpacing: "-0.01em" }}>{name}</div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* DIENSTEN */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 48px" }}>
+      {/* DIENSTEN — 1 col mobile, 2 col tablet, 3 col desktop */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: secPad }}>
         <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 64px" }}>
           <Label>Onze diensten</Label>
-          <h2 style={{ fontFamily: F.h, fontSize: 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>De juiste expertise voor elk wervingsvraagstuk.</h2>
+          <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>De juiste expertise voor elk wervingsvraagstuk.</h2>
           <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65 }}>Of u nu één positie wilt invullen of structureel zoekt naar technisch personeel — wij bieden de oplossing die past bij uw situatie.</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "1fr 1fr 1fr", gap: 24 }}>
           {[
             { title: "Werving & Selectie", desc: "Zoekt u een ervaren technisch professional voor een vaste positie? Onze consultants kennen de markt en weten waar het juiste talent te vinden is.", points: ["Persoonlijke intake en vacature-analyse", "Gescreende kandidaten binnen werkdagen", "90 dagen plaatsingsgarantie"], photo: "Kandidaat op de werkvloer", img: "/service1.png" },
             { title: "Interim & Tijdelijke Inzet", desc: "Heeft u op korte termijn extra capaciteit nodig? Wij beschikken over een netwerk van direct beschikbare professionals die snel inzetbaar zijn.", points: ["Direct beschikbare vakmensen", "Flexibele contractvormen", "Persoonlijke begeleiding gedurende de opdracht"], photo: "Professional aan het werk", img: "/service2.png" },
@@ -155,13 +218,13 @@ export default function TACHomepage() {
         </div>
       </div>
 
-      {/* GARANTIE */}
+      {/* GARANTIE — stack on mobile */}
       <div style={{ background: C.teal }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: secPad }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 80, alignItems: "center" }}>
             <div>
               <Label>Onze garantie</Label>
-              <h2 style={{ fontFamily: F.h, fontSize: 44, fontWeight: 800, color: C.white, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 20px" }}>90 dagen zekerheid op elke plaatsing.</h2>
+              <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.white, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 20px" }}>90 dagen zekerheid op elke plaatsing.</h2>
               <p style={{ fontSize: 17, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: "0 0 32px", maxWidth: 440 }}>Wij geloven in de kwaliteit van onze matches. Daarom bieden wij op elke plaatsing een garantie van 90 dagen. Vertrekt de kandidaat? Dan leveren wij kosteloos een vervanger of restitueren wij de volledige fee.</p>
               <Btn variant="primary">Neem contact op</Btn>
             </div>
@@ -188,20 +251,20 @@ export default function TACHomepage() {
         </div>
       </div>
 
-      {/* CONTACT */}
+      {/* CONTACT — stack on mobile */}
       <div style={{ background: C.offwhite }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: secPad }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 80, alignItems: "start" }}>
             <div>
               <Label>Neem contact op</Label>
-              <h2 style={{ fontFamily: F.h, fontSize: 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Samen kijken wat we voor u kunnen betekenen?</h2>
+              <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Samen kijken wat we voor u kunnen betekenen?</h2>
               <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65, margin: "0 0 36px", maxWidth: 420 }}>Of u nu een concrete vacature heeft of gewoon wilt weten wat de mogelijkheden zijn — wij denken graag met u mee. Geheel vrijblijvend.</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <div style={{ display: "flex", gap: 12 }}><span style={{ fontSize: 14, color: C.muted, width: 60 }}>Email</span><span style={{ fontSize: 15, color: C.licorice, fontWeight: 500 }}>info@tac-talent.nl</span></div>
                 <div style={{ display: "flex", gap: 12 }}><span style={{ fontSize: 14, color: C.muted, width: 60 }}>LinkedIn</span><span style={{ fontSize: 15, color: C.red, fontWeight: 500, cursor: "pointer" }}>linkedin.com/company/tac-talent</span></div>
               </div>
             </div>
-            <div style={{ background: C.white, borderRadius: 16, padding: 36, border: `1px solid ${C.gainsboro}` }}>
+            <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? 20 : 36, border: `1px solid ${C.gainsboro}` }}>
               <div style={{ fontFamily: F.h, fontSize: 20, fontWeight: 700, color: C.licorice, marginBottom: 28 }}>Laten we kennismaken</div>
               {[{ label: "Naam", ph: "Uw volledige naam" }, { label: "Bedrijf", ph: "Naam van uw organisatie" }, { label: "Email", ph: "u@bedrijf.nl" }, { label: "Telefoon", ph: "+31 (0) 6 ..." }].map((f, i) => (
                 <div key={i} style={{ marginBottom: 18 }}>
@@ -220,15 +283,15 @@ export default function TACHomepage() {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* FOOTER — stack on mobile */}
       <div style={{ background: C.licorice }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 48px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 40, paddingBottom: 40, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "48px 20px" : "56px 48px" }}>
+          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: "flex-start", gap: 40, paddingBottom: 40, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <div>
               <Logo variant="light" size="md" />
               <p style={{ fontFamily: F.b, fontSize: 14, color: "rgba(255,255,255,0.3)", marginTop: 12, maxWidth: 300, lineHeight: 1.55 }}>Specialist in het vinden van technisch personeel. Persoonlijk advies, slimme technologie, en 90 dagen garantie op elke plaatsing.</p>
             </div>
-            <div style={{ display: "flex", gap: 64 }}>
+            <div style={{ display: "flex", gap: isMobile ? 40 : 64, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontFamily: F.h, fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.2)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16 }}>Navigatie</div>
                 {["Diensten", "Expertise", "Over ons", "Contact"].map(item => (
@@ -243,7 +306,7 @@ export default function TACHomepage() {
               </div>
             </div>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 28 }}>
+          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", paddingTop: 28, gap: isMobile ? 12 : 0 }}>
             <div style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)" }}>© 2026 TAC — Talent Acquisition Company</div>
             <div style={{ display: "flex", gap: 24 }}>
               <span style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)", cursor: "pointer" }}>Privacy</span>
@@ -251,6 +314,7 @@ export default function TACHomepage() {
           </div>
         </div>
       </div>
+
     </div>
   );
 }
