@@ -113,7 +113,7 @@ export default function DienstenPage() {
               <div style={{ flex: "0 0 auto", width: isMobile ? "100%" : "48%" }}>
                 <div style={{ aspectRatio: "16/10", borderRadius: 14, overflow: "hidden", position: "relative", background: "linear-gradient(145deg, #e8e8e6 0%, #d4d4d2 40%, #e0e0de 100%)" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={d.img} alt={d.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={d.img} alt={d.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
                 </div>
               </div>
 

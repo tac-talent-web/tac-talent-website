@@ -245,7 +245,7 @@ export default function TACHomepage() {
               )}
               <div style={{ aspectRatio: "16/10", background: "linear-gradient(145deg, #e8e8e6 0%, #d4d4d2 40%, #e0e0de 100%)", position: "relative", overflow: "hidden" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={d.img} alt={d.label} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={d.img} alt={d.label} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
               </div>
               <div style={{ padding: "28px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontFamily: F.h, fontSize: 22, fontWeight: 700, color: C.licorice, margin: "0 0 10px", lineHeight: 1.2 }}>{d.title}</h3>
