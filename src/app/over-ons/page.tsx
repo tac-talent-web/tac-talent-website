@@ -41,16 +41,19 @@ const CONSULTANTS = [
     name: "Sophie van den Berg",
     title: "Senior Consultant W&S",
     bio: "Sophie heeft 8 jaar ervaring in technische werving. Zij is gespecialiseerd in machinebouw en installatietechniek en staat bekend om haar directe communicatie.",
+    img: "/consultant-sophie.webp",
   },
   {
     name: "Daan Hoekstra",
     title: "Consultant Interim",
     bio: "Daan werkt dagelijks met opdrachtgevers die snel iemand nodig hebben. Zijn netwerk van direct beschikbare technici maakt hem de aangewezen persoon voor urgente opdrachten.",
+    img: "/consultant-daan.webp",
   },
   {
     name: "Lena Martens",
     title: "Consultant Advies",
     bio: "Lena combineert marktdata met praktijkervaring om opdrachtgevers eerlijk advies te geven. Zij helpt ook bij het schrijven van vacatureteksten die wél de juiste kandidaten trekken.",
+    img: "/consultant-lena.webp",
   },
 ];
 
@@ -132,7 +135,8 @@ export default function OverOnsPage() {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 28 }}>
             {CONSULTANTS.map((c, i) => (
               <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "32px 24px", border: `1px solid ${C.gainsboro}`, borderRadius: 14 }}>
-                <div style={{ width: 88, height: 88, borderRadius: "50%", background: "linear-gradient(145deg, #1e2a2f 0%, #2d3d44 50%, #1a2428 100%)", marginBottom: 20, flexShrink: 0 }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.img} alt={c.name} style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", objectPosition: "center top", borderRadius: 12, marginBottom: 20 }} />
                 <div style={{ fontFamily: F.h, fontSize: 18, fontWeight: 700, color: C.licorice, marginBottom: 4 }}>{c.name}</div>
                 <div style={{ fontFamily: F.b, fontSize: 13, color: C.muted, marginBottom: 16 }}>{c.title}</div>
                 <p style={{ fontFamily: F.b, fontSize: 14, color: C.muted, lineHeight: 1.65, margin: 0 }}>{c.bio}</p>

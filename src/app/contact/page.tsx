@@ -118,29 +118,19 @@ export default function ContactPage() {
               <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.7, margin: "0 0 36px" }}>
                 Of u nu een concrete vacature heeft of gewoon wilt weten wat de mogelijkheden zijn — wij denken graag met u mee. Geheel vrijblijvend.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: C.white, border: `1px solid ${C.gainsboro}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M2 3h12v10H2V3z" stroke={C.red} strokeWidth="1.5" fill="none" />
-                      <path d="M2 3l6 5 6-5" stroke={C.red} strokeWidth="1.5" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: F.h, fontSize: 12, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Email</div>
-                    <a href="mailto:info@tac-talent.nl" style={{ fontSize: 15, color: C.licorice, fontWeight: 500, textDecoration: "none" }}>info@tac-talent.nl</a>
-                  </div>
+              <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: C.white, border: `1px solid ${C.gainsboro}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z" stroke={C.red} strokeWidth="1.5" fill="none" />
+                    <circle cx="8" cy="6" r="1.5" stroke={C.red} strokeWidth="1.5" />
+                  </svg>
                 </div>
-                <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: C.white, border: `1px solid ${C.gainsboro}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <rect x="1" y="2" width="14" height="12" rx="2" stroke={C.red} strokeWidth="1.5" />
-                      <path d="M5 6h6M5 9h4" stroke={C.red} strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: F.h, fontSize: 12, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>LinkedIn</div>
-                    <a href="https://linkedin.com/company/tac-talent" target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, color: C.red, fontWeight: 500, textDecoration: "none" }}>linkedin.com/company/tac-talent</a>
+                <div>
+                  <div style={{ fontFamily: F.h, fontSize: 12, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Adres</div>
+                  <div style={{ fontSize: 15, color: C.licorice, fontWeight: 500, lineHeight: 1.6 }}>
+                    TAC — Talent Acquisition Company<br />
+                    Stationsplein 12<br />
+                    7511 JD Enschede
                   </div>
                 </div>
               </div>

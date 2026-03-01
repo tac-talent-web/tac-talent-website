@@ -73,7 +73,10 @@ export default function Footer() {
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", paddingTop: 28, gap: isMobile ? 12 : 0 }}>
-          <div style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)" }}>&copy; 2026 TAC &mdash; Talent Acquisition Company</div>
+          <div>
+            <div style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)" }}>&copy; 2026 TAC &mdash; Talent Acquisition Company</div>
+            <div style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)", marginTop: 4 }}>Stationsplein 12, 7511 JD Enschede</div>
+          </div>
           <div style={{ display: "flex", gap: 24 }}>
             <span style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,0.15)", cursor: "pointer" }}>Privacy</span>
           </div>

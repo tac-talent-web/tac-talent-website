@@ -170,8 +170,8 @@ export default function TACHomepage() {
             {[
               { n: "30", l: "dagen garantie" },
               { n: "No cure", l: "no pay" },
-              { n: "< 5", l: "werkdagen tot voordracht" },
-              { n: "Tech + Persoonlijk", l: "onze aanpak" },
+              { n: "< 14", l: "werkdagen tot eerste kandidaat" },
+              { n: "Persoonlijk", l: "onze aanpak" },
             ].map((s, i) => (
               <div key={i}>
                 <div style={{ fontFamily: F.h, fontSize: isMobile ? 28 : 38, fontWeight: 800, color: C.white, lineHeight: 1 }}>{s.n}</div>
@@ -186,13 +186,19 @@ export default function TACHomepage() {
       <div style={{ borderBottom: `1px solid ${C.gainsboro}`, padding: isMobile ? "28px 20px" : "36px 48px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ fontFamily: F.h, fontSize: 11, fontWeight: 500, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "center", marginBottom: 20 }}>Bedrijven die wij ondersteunen bij hun zoektocht naar technisch talent</div>
-          <div style={{ display: "flex", gap: isMobile ? 4 : 8, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
-            <ClientLogo name="Vortex Industries" />
-            <ClientLogo name="Kroon Engineering" withSymbol symbolType="hex" />
-            <ClientLogo name="Staalwerk Group" />
-            <ClientLogo name="Meridian Technical" withSymbol symbolType="circuit" />
-            <ClientLogo name="Nordvik Systems" />
-            <ClientLogo name="Atlas Constructie" />
+          <div style={{ display: "flex", gap: isMobile ? 16 : 32, alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-vortex.webp" alt="Vortex Industries" style={{ height: 36, width: "auto", opacity: 0.6, filter: "grayscale(100%)" }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-kroon.webp" alt="Kroon Engineering" style={{ height: 36, width: "auto", opacity: 0.6, filter: "grayscale(100%)" }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-staalwerk.webp" alt="Staalwerk Group" style={{ height: 36, width: "auto", opacity: 0.6, filter: "grayscale(100%)" }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-meridian.webp" alt="Meridian Technical" style={{ height: 36, width: "auto", opacity: 0.6, filter: "grayscale(100%)" }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-nordvik.webp" alt="Nordvik Systems" style={{ height: 36, width: "auto", opacity: 0.6, filter: "grayscale(100%)" }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-atlas.webp" alt="Atlas Constructie" style={{ height: 36, width: "auto", opacity: 0.6, filter: "grayscale(100%)" }} />
           </div>
         </div>
       </div>
@@ -329,20 +335,24 @@ export default function TACHomepage() {
                 name: "Sophie van den Berg",
                 title: "Senior Consultant W&S",
                 bio: "Sophie heeft 8 jaar ervaring in technische werving. Zij is gespecialiseerd in machinebouw en installatietechniek en staat bekend om haar directe communicatie.",
+                img: "/consultant-sophie.webp",
               },
               {
                 name: "Daan Hoekstra",
                 title: "Consultant Interim",
                 bio: "Daan werkt dagelijks met opdrachtgevers die snel iemand nodig hebben. Zijn netwerk van direct beschikbare technici maakt hem de aangewezen persoon voor urgente opdrachten.",
+                img: "/consultant-daan.webp",
               },
               {
                 name: "Lena Martens",
                 title: "Consultant Advies",
                 bio: "Lena combineert marktdata met praktijkervaring om opdrachtgevers eerlijk advies te geven. Zij helpt ook bij het schrijven van vacatureteksten die wél de juiste kandidaten trekken.",
+                img: "/consultant-lena.webp",
               },
             ].map((c, i) => (
               <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "32px 24px", border: `1px solid ${C.gainsboro}`, borderRadius: 14 }}>
-                <div style={{ width: 88, height: 88, borderRadius: "50%", background: "linear-gradient(145deg, #1e2a2f 0%, #2d3d44 50%, #1a2428 100%)", marginBottom: 20, flexShrink: 0 }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.img} alt={c.name} style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", objectPosition: "center top", borderRadius: 12, marginBottom: 20 }} />
                 <div style={{ fontFamily: F.h, fontSize: 18, fontWeight: 700, color: C.licorice, marginBottom: 4 }}>{c.name}</div>
                 <div style={{ fontFamily: F.b, fontSize: 13, color: C.muted, marginBottom: 16 }}>{c.title}</div>
                 <p style={{ fontFamily: F.b, fontSize: 14, color: C.muted, lineHeight: 1.65, margin: 0 }}>{c.bio}</p>
@@ -372,8 +382,8 @@ export default function TACHomepage() {
               ].map((item, i) => (
                 <div key={i} style={{ padding: "22px 24px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: C.sage, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <span style={{ color: C.teal, fontSize: 14, fontWeight: 800, lineHeight: 1 }}>✓</span>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: "#EC5C3B", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <span style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 800, lineHeight: 1 }}>✓</span>
                     </div>
                     <div>
                       <div style={{ fontFamily: F.h, fontSize: 16, fontWeight: 700, color: C.white, marginBottom: 3 }}>{item.title}</div>
@@ -410,17 +420,7 @@ export default function TACHomepage() {
             <div>
               <Label>Neem contact op</Label>
               <h2 style={{ fontFamily: F.h, fontSize: isMobile ? 28 : isTablet ? 36 : 44, fontWeight: 800, color: C.licorice, lineHeight: 1.08, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Samen kijken wat we voor u kunnen betekenen?</h2>
-              <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65, margin: "0 0 36px", maxWidth: 420 }}>Of u nu een concrete vacature heeft of gewoon wilt weten wat de mogelijkheden zijn — wij denken graag met u mee. Geheel vrijblijvend.</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ display: "flex", gap: 12 }}>
-                  <span style={{ fontSize: 14, color: C.muted, width: 64 }}>Email</span>
-                  <span style={{ fontSize: 15, color: C.licorice, fontWeight: 500 }}>info@tac-talent.nl</span>
-                </div>
-                <div style={{ display: "flex", gap: 12 }}>
-                  <span style={{ fontSize: 14, color: C.muted, width: 64 }}>LinkedIn</span>
-                  <a href="https://linkedin.com/company/tac-talent" target="_blank" rel="noopener noreferrer" style={{ fontSize: 15, color: C.red, fontWeight: 500, textDecoration: "none" }}>linkedin.com/company/tac-talent</a>
-                </div>
-              </div>
+              <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65, margin: 0, maxWidth: 420 }}>Of u nu een concrete vacature heeft of gewoon wilt weten wat de mogelijkheden zijn — wij denken graag met u mee. Geheel vrijblijvend.</p>
             </div>
             <div style={{ background: C.white, borderRadius: 16, padding: isMobile ? 20 : 36, border: `1px solid ${C.gainsboro}` }}>
               <div style={{ fontFamily: F.h, fontSize: 20, fontWeight: 700, color: C.licorice, marginBottom: 28 }}>Laten we kennismaken</div>
