@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -224,75 +224,79 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
             )}
           </div>
 
-          {/* KAART PANEL */}
-          {showMap && (
-            <div style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.gainsboro}`, padding: 24, marginBottom: 24 }}>
-              <div style={{ fontFamily: F.b, fontSize: 14, fontWeight: 600, color: C.licorice, marginBottom: 12 }}>
-                Zoek op locatie en reisafstand
+          {/* MAIN CONTENT: vacatures + optionele kaart sidebar */}
+          <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+
+            {/* VACATURES KOLOM */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* RESULT COUNT */}
+              <div style={{ fontFamily: F.b, fontSize: 14, color: C.muted, marginBottom: 20 }}>
+                {centerCoords && !jobCoordsReady
+                  ? "Locaties berekenen..."
+                  : filtered.length === 0
+                  ? "Geen vacatures gevonden"
+                  : `${filtered.length} vacature${filtered.length !== 1 ? "s" : ""} gevonden${centerCoords ? ` binnen ${radius} km` : ""}`}
               </div>
-              {/* Locatie input */}
-              <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-                <div style={{ position: "relative", flex: "1 1 260px" }}>
-                  <input
-                    type="text"
-                    placeholder="Typ een stad of postcode..."
-                    value={locationInput}
-                    onChange={(e) => setLocationInput(e.target.value)}
-                    style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: C.offwhite, fontFamily: F.b, fontSize: 14, color: C.licorice, outline: "none" }}
+
+              {/* GRID */}
+              {filtered.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "80px 40px", background: C.white, borderRadius: 16, border: `1px solid ${C.gainsboro}` }}>
+                  <div style={{ fontFamily: F.h, fontSize: 28, fontWeight: 700, color: C.licorice, marginBottom: 16 }}>Geen vacatures gevonden</div>
+                  <p style={{ fontFamily: F.b, fontSize: 16, color: C.muted, maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.6 }}>
+                    Pas je zoekopdracht aan of stuur ons een spontane sollicitatie.
+                  </p>
+                  <a href="mailto:careers@thetalentacquisitioncompany.nl" style={{ display: "inline-block", padding: "14px 28px", borderRadius: 8, background: C.red, color: C.white, fontFamily: F.b, fontSize: 15, fontWeight: 600, textDecoration: "none" }}>
+                    Stuur spontane sollicitatie
+                  </a>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: showMap ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))", gap: 20 }}>
+                  {filtered.map((job) => <JobCard key={job.id} job={job} />)}
+                </div>
+              )}
+            </div>
+
+            {/* KAART SIDEBAR (rechts, sticky) */}
+            {showMap && (
+              <div style={{ width: 340, flexShrink: 0, position: "sticky", top: 96 }}>
+                <div style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.gainsboro}`, padding: 16 }}>
+                  <div style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.licorice, marginBottom: 10 }}>
+                    📍 Zoek op reisafstand
+                  </div>
+                  <div style={{ position: "relative", marginBottom: 12 }}>
+                    <input
+                      type="text"
+                      placeholder="Stad of postcode..."
+                      value={locationInput}
+                      onChange={(e) => setLocationInput(e.target.value)}
+                      style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: C.offwhite, fontFamily: F.b, fontSize: 13, color: C.licorice, outline: "none" }}
+                    />
+                    {isGeocoding && (
+                      <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: C.muted }}>⏳</span>
+                    )}
+                  </div>
+                  <RadiusMap
+                    center={centerCoords}
+                    radius={radius}
+                    onMapClick={(coords) => { setCenterCoords(coords); setLocationInput(""); }}
+                    onRadiusChange={setRadius}
                   />
-                  {isGeocoding && (
-                    <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: C.muted }}>⏳</span>
+                  {locationInput && !isGeocoding && !centerCoords && (
+                    <p style={{ fontFamily: F.b, fontSize: 12, color: C.red, margin: "8px 0 0" }}>Locatie niet gevonden.</p>
+                  )}
+                  {centerCoords ? (
+                    <p style={{ fontFamily: F.b, fontSize: 12, color: C.muted, margin: "8px 0 0" }}>
+                      ✅ {filtered.length} vacature{filtered.length !== 1 ? "s" : ""} binnen <strong>{radius} km</strong>
+                    </p>
+                  ) : (
+                    <p style={{ fontFamily: F.b, fontSize: 12, color: C.muted, margin: "8px 0 0" }}>
+                      Typ een locatie of klik op de kaart.
+                    </p>
                   )}
                 </div>
-                <span style={{ fontFamily: F.b, fontSize: 13, color: C.muted, alignSelf: "center" }}>
-                  Of klik op de kaart om een punt te kiezen.
-                </span>
               </div>
-
-              {/* Kaart */}
-              <RadiusMap
-                center={centerCoords}
-                radius={radius}
-                onMapClick={(coords) => { setCenterCoords(coords); setLocationInput(""); }}
-                onRadiusChange={setRadius}
-              />
-
-              {locationInput && !isGeocoding && !centerCoords && (
-                <p style={{ fontFamily: F.b, fontSize: 13, color: C.red, marginTop: 8 }}>Locatie niet gevonden. Probeer een andere plaatsnaam.</p>
-              )}
-              {centerCoords && (
-                <p style={{ fontFamily: F.b, fontSize: 13, color: C.muted, marginTop: 8 }}>
-                  ✅ Zoekradius actief — vacatures binnen <strong>{radius} km</strong> worden getoond.
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* RESULT COUNT */}
-          <div style={{ fontFamily: F.b, fontSize: 14, color: C.muted, marginBottom: 24 }}>
-            {centerCoords && !jobCoordsReady
-              ? "Locaties berekenen..."
-              : filtered.length === 0
-              ? "Geen vacatures gevonden"
-              : `${filtered.length} vacature${filtered.length !== 1 ? "s" : ""} gevonden${centerCoords ? ` binnen ${radius} km` : ""}`}
+            )}
           </div>
-
-          {/* GRID */}
-          {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "80px 40px", background: C.white, borderRadius: 16, border: `1px solid ${C.gainsboro}` }}>
-              <div style={{ fontFamily: F.h, fontSize: 28, fontWeight: 700, color: C.licorice, marginBottom: 16 }}>Geen vacatures gevonden</div>
-              <p style={{ fontFamily: F.b, fontSize: 16, color: C.muted, maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.6 }}>
-                Pas je zoekopdracht aan of stuur ons een spontane sollicitatie.
-              </p>
-              <a href="mailto:careers@thetalentacquisitioncompany.nl" style={{ display: "inline-block", padding: "14px 28px", borderRadius: 8, background: C.red, color: C.white, fontFamily: F.b, fontSize: 15, fontWeight: 600, textDecoration: "none" }}>
-                Stuur spontane sollicitatie
-              </a>
-            </div>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 24 }}>
-              {filtered.map((job) => <JobCard key={job.id} job={job} />)}
-            </div>
-          )}
         </div>
       </div>
     </>
