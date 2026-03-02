@@ -136,6 +136,67 @@ Als Servicemonteur ben jij verantwoordelijk voor het diagnosticeren en repareren
   },
 ];
 
+// RFC 4180-compliant CSV parser — handles quoted fields, embedded commas, and embedded newlines
+function parseCSV(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = '';
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          // Escaped double-quote inside quoted field
+          field += '"';
+          i += 2;
+        } else {
+          inQuotes = false;
+          i++;
+        }
+      } else {
+        field += ch;
+        i++;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+        i++;
+      } else if (ch === ',') {
+        row.push(field);
+        field = '';
+        i++;
+      } else if (ch === '\r' && text[i + 1] === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+        i += 2;
+      } else if (ch === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+        i++;
+      } else {
+        field += ch;
+        i++;
+      }
+    }
+  }
+
+  // Flush last row
+  if (row.length > 0 || field !== '') {
+    row.push(field);
+    if (row.some((f) => f !== '')) rows.push(row);
+  }
+
+  return rows;
+}
+
 function parseSheetRow(row: string[], index: number): Job | null {
   if (!row[0]?.trim()) return null;
 
@@ -176,35 +237,36 @@ function parseSheetRow(row: string[], index: number): Job | null {
 
 export async function getJobs(): Promise<Job[]> {
   const sheetId = process.env.GOOGLE_SHEET_ID;
-  const apiKey = process.env.GOOGLE_API_KEY;
 
-  if (!sheetId || !apiKey) {
+  if (!sheetId) {
     return FALLBACK_JOBS;
   }
 
   try {
-    const range = 'A2:J200';
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
 
     const res = await fetch(url, {
       next: { revalidate: 300 },
     });
 
     if (!res.ok) {
-      console.warn('[TAC Jobs] Google Sheets API error, using fallback:', res.status);
+      console.warn('[TAC Jobs] CSV fetch error, using fallback:', res.status);
       return FALLBACK_JOBS;
     }
 
-    const data = await res.json();
-    const rows: string[][] = data.values || [];
+    const text = await res.text();
+    const allRows = parseCSV(text);
 
-    const jobs = rows
+    // Skip header row (index 0)
+    const dataRows = allRows.slice(1);
+
+    const jobs = dataRows
       .map((row, i) => parseSheetRow(row, i))
       .filter((j): j is Job => j !== null);
 
     return jobs.length > 0 ? jobs : FALLBACK_JOBS;
   } catch (err) {
-    console.warn('[TAC Jobs] Failed to fetch from Google Sheets, using fallback:', err);
+    console.warn('[TAC Jobs] Failed to fetch CSV, using fallback:', err);
     return FALLBACK_JOBS;
   }
 }
