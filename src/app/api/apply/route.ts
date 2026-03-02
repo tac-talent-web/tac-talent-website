@@ -37,8 +37,8 @@ async function sendEmailViaZapierMCP(
   const tijdstip = new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" });
 
   const emailBody = `Nieuwe sollicitatie via TAC jobboard.\n\nVacature: ${jobTitle}\nNaam: ${naam}\nE-mail: ${email}\nTelefoon: ${telefoon || "niet opgegeven"}\nMotivatie: ${bericht || "niet opgegeven"}\nTijdstip: ${tijdstip}`;
-
-  const instruction = `Send an email to ${toEmail} with subject "Nieuwe sollicitatie: ${jobTitle} van ${naam}" and body: ${emailBody}`;
+  const subject = `Nieuwe sollicitatie: ${jobTitle} van ${naam}`;
+  const instruction = `Send an email to ${toEmail} with subject "${subject}" and body: ${emailBody}`;
 
   const res = await fetch(
     `https://mcp.zapier.com/api/mcp/s/${zapierToken}/mcp`,
@@ -47,28 +47,48 @@ async function sendEmailViaZapierMCP(
       headers: { "Content-Type": "application/json", Accept: "application/json, text/event-stream" },
       body: JSON.stringify({
         jsonrpc: "2.0", id: 1, method: "tools/call",
-        params: { name: "email_by_zapier_send_outbound_email", arguments: { instructions: instruction, output_hint: "email sent confirmation" } }
+        params: {
+          name: "email_by_zapier_send_outbound_email",
+          arguments: { instructions: instruction, output_hint: "email sent confirmation" }
+        }
       }),
     }
   );
 
-  if (!res.ok) throw new Error(`Zapier MCP error: ${res.status}`);
-  const text = await res.text();
-  console.log("[TAC Apply] Zapier response:", text.substring(0, 300));
+  if (!res.ok) throw new Error(`Zapier MCP HTTP error: ${res.status}`);
+
+  // Zapier MCP returns SSE — extract the data line
+  const rawText = await res.text();
+  const dataLine = rawText.split("\n").find((l) => l.startsWith("data: {"));
+  if (!dataLine) throw new Error(`Zapier MCP: no data line in response`);
+
+  const parsed = JSON.parse(dataLine.replace(/^data: /, ""));
+  const status = parsed?.result?.content?.[0]?.text
+    ? JSON.parse(parsed.result.content[0].text)?.execution?.status
+    : "UNKNOWN";
+
+  console.log("[TAC Apply] Zapier email status:", status);
+  if (status !== "SUCCESS") throw new Error(`Zapier email not sent, status: ${status}`);
 }
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin") ?? "";
-  const allowed = origin.includes("tac-talent-website.vercel.app") || origin.includes("thetalentacquisitioncompany") || origin.includes("localhost") || origin === "";
+  const allowed =
+    origin.includes("tac-talent-website.vercel.app") ||
+    origin.includes("thetalentacquisitioncompany") ||
+    origin.includes("localhost") ||
+    origin === "";
   if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const ip = getClientIp(request);
-  if (!checkRateLimit(ip)) return NextResponse.json({ error: "Te veel verzoeken. Probeer het over een uur opnieuw." }, { status: 429 });
+  if (!checkRateLimit(ip))
+    return NextResponse.json({ error: "Te veel verzoeken. Probeer het over een uur opnieuw." }, { status: 429 });
 
   let body: Record<string, unknown>;
-  try { body = await request.json(); } catch { return NextResponse.json({ error: "Ongeldig verzoek." }, { status: 400 }); }
+  try { body = await request.json(); }
+  catch { return NextResponse.json({ error: "Ongeldig verzoek." }, { status: 400 }); }
 
-  if (body.website) return NextResponse.json({ success: true, message: "Bedankt voor je sollicitatie!" });
+  if (body.website) return NextResponse.json({ success: true });
 
   const naam = (body.naam as string)?.trim();
   const email = (body.email as string)?.trim();
@@ -79,9 +99,12 @@ export async function POST(request: NextRequest) {
 
   if (!naam) return NextResponse.json({ error: "Naam is verplicht." }, { status: 400 });
   if (!email) return NextResponse.json({ error: "E-mailadres is verplicht." }, { status: 400 });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Ongeldig e-mailadres." }, { status: 400 });
-  if (!privacy) return NextResponse.json({ error: "Geef akkoord op het privacybeleid." }, { status: 400 });
-  if (bericht.length > 500) return NextResponse.json({ error: "Bericht mag maximaal 500 tekens bevatten." }, { status: 400 });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return NextResponse.json({ error: "Ongeldig e-mailadres." }, { status: 400 });
+  if (!privacy)
+    return NextResponse.json({ error: "Geef akkoord op het privacybeleid." }, { status: 400 });
+  if (bericht.length > 500)
+    return NextResponse.json({ error: "Bericht mag maximaal 500 tekens bevatten." }, { status: 400 });
 
   console.log("[TAC Apply]", { naam, email, jobTitle, timestamp: new Date().toISOString() });
 
