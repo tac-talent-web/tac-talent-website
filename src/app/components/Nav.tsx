@@ -31,6 +31,7 @@ const NAV_LINKS = [
   { label: "Diensten", href: "/diensten" },
   { label: "Expertise", href: "/expertise" },
   { label: "Over ons", href: "/over-ons" },
+  { label: "Vacatures", href: "/vacatures" },
   { label: "Contact", href: "/contact" },
 ];
 
