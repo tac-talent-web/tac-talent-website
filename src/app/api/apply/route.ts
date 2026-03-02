@@ -21,16 +21,39 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-async function sendEmailViaResend(
+const MS_CLIENT_ID = "d3590ed6-52b3-4102-aeff-aad2292ab01c";
+const MS_TENANT_ID = "89649f3e-15a6-4479-b24b-878cf33df42a";
+
+async function getGraphToken(): Promise<string> {
+  const username = process.env.MS_USERNAME!;
+  const password = process.env.MS_PASSWORD!;
+
+  const body = new URLSearchParams({
+    grant_type: "password",
+    client_id: MS_CLIENT_ID,
+    username,
+    password,
+    scope: "https://graph.microsoft.com/.default",
+  });
+
+  const res = await fetch(
+    `https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token`,
+    { method: "POST", body }
+  );
+  const data = await res.json();
+  if (!data.access_token) throw new Error(`MSAL token error: ${JSON.stringify(data)}`);
+  return data.access_token;
+}
+
+async function sendEmailViaGraph(
   naam: string,
   email: string,
   telefoon: string,
   bericht: string,
   jobTitle: string
 ): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.log("[TAC Apply] No RESEND_API_KEY — logging only:", { naam, email, jobTitle });
+  if (!process.env.MS_USERNAME || !process.env.MS_PASSWORD) {
+    console.log("[TAC Apply] No MS_USERNAME/MS_PASSWORD — logging only:", { naam, email, jobTitle });
     return;
   }
 
@@ -48,24 +71,29 @@ async function sendEmailViaResend(
     </table>
   `;
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const token = await getGraphToken();
+
+  const mailBody = {
+    message: {
+      subject: `Nieuwe sollicitatie: ${jobTitle} — ${naam}`,
+      body: { contentType: "HTML", content: html },
+      toRecipients: [{ emailAddress: { address: toEmail } }],
+      replyTo: [{ emailAddress: { address: email } }],
+    },
+  };
+
+  const res = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      from: "TAC Jobboard <noreply@thetalentacquisitioncompany.nl>",
-      to: [toEmail],
-      reply_to: email,
-      subject: `Nieuwe sollicitatie: ${jobTitle} — ${naam}`,
-      html,
-    }),
+    body: JSON.stringify(mailBody),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Resend error: ${err}`);
+    throw new Error(`Graph sendMail error: ${err}`);
   }
 }
 
@@ -123,7 +151,7 @@ export async function POST(request: NextRequest) {
   console.log("[TAC Apply]", { naam, email, jobTitle, timestamp: new Date().toISOString() });
 
   try {
-    await sendEmailViaResend(naam, email, telefoon, bericht, jobTitle);
+    await sendEmailViaGraph(naam, email, telefoon, bericht, jobTitle);
   } catch (err) {
     console.error("[TAC Apply] Email error (non-fatal):", err);
     // Non-fatal: we still return success so the user is not left confused
