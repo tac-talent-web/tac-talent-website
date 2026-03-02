@@ -235,22 +235,21 @@ function parseSheetRow(row: string[], index: number): Job | null {
   };
 }
 
+const SHEET_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQxuHOkrjcquUq6o4hyuco_qi8XY6l-_GQ3BV7wnhsZJRO4Pd5IuUkMU8h8usg_5dmCOoweAXO8RYn9/pub?gid=0&single=true&output=csv';
+
 export async function getJobs(): Promise<Job[]> {
   const sheetId = process.env.GOOGLE_SHEET_ID;
-
-  if (!sheetId) {
-    return FALLBACK_JOBS;
-  }
+  const url = sheetId
+    ? `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`
+    : SHEET_CSV_URL;
 
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
 
-    const res = await fetch(url, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(url, { next: { revalidate: 300 } });
 
     if (!res.ok) {
-      console.warn('[TAC Jobs] CSV fetch error, using fallback:', res.status);
+      console.warn('[TAC Jobs] CSV fetch error, using fallback. Status:', res.status, 'URL:', url);
       return FALLBACK_JOBS;
     }
 
