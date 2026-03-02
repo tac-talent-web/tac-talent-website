@@ -2,7 +2,10 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Job } from "@/lib/jobs";
+
+const RadiusMap = dynamic(() => import("../components/RadiusMap"), { ssr: false });
 
 const C = {
   licorice: "#111111",
@@ -48,9 +51,7 @@ async function geocode(query: string): Promise<Coords | null> {
     const data = await res.json();
     if (!data?.[0]) return null;
     return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function Badge({ label, color = C.offwhite, textColor = C.muted }: { label: string; color?: string; textColor?: string }) {
@@ -99,9 +100,10 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [showMap, setShowMap] = useState(false);
 
-  // Radius filter state
-  const [radiusInput, setRadiusInput] = useState("");
+  // Radius filter
+  const [locationInput, setLocationInput] = useState("");
   const [radius, setRadius] = useState(30);
   const [centerCoords, setCenterCoords] = useState<Coords | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -111,35 +113,29 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
 
   const categories = useMemo(() => Array.from(new Set(jobs.map((j) => j.category))).sort(), [jobs]);
 
-  // Debounced geocode van de ingetypte locatie
+  // Debounced geocode van ingetypte locatie
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!radiusInput.trim()) {
-      setCenterCoords(null);
-      setIsGeocoding(false);
-      return;
-    }
+    if (!locationInput.trim()) { setCenterCoords(null); setIsGeocoding(false); return; }
     setIsGeocoding(true);
     debounceRef.current = setTimeout(async () => {
-      const coords = await geocode(radiusInput.trim());
+      const coords = await geocode(locationInput.trim());
       setCenterCoords(coords);
       setIsGeocoding(false);
     }, 600);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [radiusInput]);
+  }, [locationInput]);
 
-  // Geocode vacaturelocaties (eenmalig, gecached)
+  // Geocode vacaturelocaties wanneer center bekend is
   useEffect(() => {
     if (!centerCoords) return;
     const missing = jobs.map((j) => j.location).filter((loc) => !jobCoordsCache.current.has(loc));
     if (missing.length === 0) { setJobCoordsReady(true); return; }
     setJobCoordsReady(false);
-    Promise.all(
-      missing.map(async (loc) => {
-        const coords = await geocode(loc + ", Nederland");
-        jobCoordsCache.current.set(loc, coords);
-      })
-    ).then(() => setJobCoordsReady(true));
+    Promise.all(missing.map(async (loc) => {
+      const coords = await geocode(loc + ", Nederland");
+      jobCoordsCache.current.set(loc, coords);
+    })).then(() => setJobCoordsReady(true));
   }, [centerCoords, jobs]);
 
   const filtered = useMemo(() => {
@@ -148,31 +144,21 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
       const matchSearch = !q || j.title.toLowerCase().includes(q) || j.description.toLowerCase().includes(q) || j.category.toLowerCase().includes(q) || j.location.toLowerCase().includes(q);
       const matchCategory = !filterCategory || j.category === filterCategory;
       const matchType = !filterType || j.employmentType === filterType;
-
       let matchRadius = true;
       if (centerCoords && jobCoordsReady) {
-        const jobCoords = jobCoordsCache.current.get(j.location);
-        if (jobCoords) {
-          matchRadius = haversineKm(centerCoords, jobCoords) <= radius;
-        } else {
-          matchRadius = false;
-        }
+        const jc = jobCoordsCache.current.get(j.location);
+        matchRadius = jc ? haversineKm(centerCoords, jc) <= radius : false;
       }
-
       return matchSearch && matchCategory && matchType && matchRadius;
     });
   }, [jobs, search, filterCategory, filterType, centerCoords, radius, jobCoordsReady]);
 
-  const hasActiveFilters = search || filterCategory || filterType || radiusInput;
+  const hasActiveFilters = search || filterCategory || filterType || centerCoords;
 
   const selectStyle: React.CSSProperties = {
     padding: "10px 14px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: C.white, fontFamily: F.b, fontSize: 14, color: C.licorice, cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none",
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236B7178' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")`,
     backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", paddingRight: 32, minWidth: 160,
-  };
-
-  const inputStyle: React.CSSProperties = {
-    flex: "1 1 200px", padding: "10px 14px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: C.offwhite, fontFamily: F.b, fontSize: 14, color: C.licorice, outline: "none",
   };
 
   return (
@@ -197,59 +183,18 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 48px" }}>
 
           {/* FILTER BAR */}
-          <div style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.gainsboro}`, padding: "20px 24px", marginBottom: 36, display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
-
-            {/* Zoekterm */}
+          <div style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.gainsboro}`, padding: "20px 24px", marginBottom: 24, display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
             <input
               type="text"
-              placeholder="Zoek vacature, categorie..."
+              placeholder="Zoek functie, categorie..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ ...inputStyle, flex: "1 1 220px" }}
+              style={{ flex: "1 1 200px", padding: "10px 14px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: C.offwhite, fontFamily: F.b, fontSize: 14, color: C.licorice, outline: "none" }}
             />
-
-            {/* Locatie + radius */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: "1 1 220px" }}>
-              <div style={{ position: "relative" }}>
-                <input
-                  type="text"
-                  placeholder="📍 Locatie (bijv. Amsterdam)"
-                  value={radiusInput}
-                  onChange={(e) => setRadiusInput(e.target.value)}
-                  style={{ ...inputStyle, flex: "unset", width: "100%", boxSizing: "border-box", paddingRight: isGeocoding ? 36 : 14 }}
-                />
-                {isGeocoding && (
-                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: C.muted }}>⏳</span>
-                )}
-              </div>
-              {radiusInput && (
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <input
-                    type="range"
-                    min={5}
-                    max={100}
-                    step={5}
-                    value={radius}
-                    onChange={(e) => setRadius(Number(e.target.value))}
-                    style={{ flex: 1, accentColor: C.red, cursor: "pointer" }}
-                  />
-                  <span style={{ fontFamily: F.b, fontSize: 13, color: C.muted, whiteSpace: "nowrap", minWidth: 60 }}>
-                    tot {radius} km
-                  </span>
-                </div>
-              )}
-              {radiusInput && !isGeocoding && !centerCoords && (
-                <span style={{ fontFamily: F.b, fontSize: 12, color: C.red }}>Locatie niet gevonden</span>
-              )}
-            </div>
-
-            {/* Categorie */}
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} style={selectStyle}>
               <option value="">Alle categorieën</option>
               {categories.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
-
-            {/* Contracttype */}
             <select value={filterType} onChange={(e) => setFilterType(e.target.value)} style={selectStyle}>
               <option value="">Alle contracttypes</option>
               <option value="FULL_TIME">Fulltime</option>
@@ -257,9 +202,21 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
               <option value="CONTRACT">Contract</option>
             </select>
 
+            {/* Kaart toggle */}
+            <button
+              onClick={() => setShowMap((v) => !v)}
+              style={{
+                padding: "10px 16px", borderRadius: 8, border: `1px solid ${centerCoords ? C.red : C.gainsboro}`,
+                background: centerCoords ? "#FFF7F4" : "transparent", fontFamily: F.b, fontSize: 14,
+                color: centerCoords ? C.red : C.muted, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontWeight: centerCoords ? 600 : 400,
+              }}
+            >
+              📍 {centerCoords ? `Binnen ${radius} km` : "Zoek op kaart"}
+            </button>
+
             {hasActiveFilters && (
               <button
-                onClick={() => { setSearch(""); setFilterCategory(""); setFilterType(""); setRadiusInput(""); setCenterCoords(null); setRadius(30); }}
+                onClick={() => { setSearch(""); setFilterCategory(""); setFilterType(""); setLocationInput(""); setCenterCoords(null); setRadius(30); setShowMap(false); }}
                 style={{ padding: "10px 16px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: "transparent", fontFamily: F.b, fontSize: 14, color: C.muted, cursor: "pointer" }}
               >
                 Wissen
@@ -267,21 +224,63 @@ export default function VacaturesClient({ jobs }: { jobs: Job[] }) {
             )}
           </div>
 
+          {/* KAART PANEL */}
+          {showMap && (
+            <div style={{ background: C.white, borderRadius: 12, border: `1px solid ${C.gainsboro}`, padding: 24, marginBottom: 24 }}>
+              <div style={{ fontFamily: F.b, fontSize: 14, fontWeight: 600, color: C.licorice, marginBottom: 12 }}>
+                Zoek op locatie en reisafstand
+              </div>
+              {/* Locatie input */}
+              <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+                <div style={{ position: "relative", flex: "1 1 260px" }}>
+                  <input
+                    type="text"
+                    placeholder="Typ een stad of postcode..."
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", borderRadius: 8, border: `1px solid ${C.gainsboro}`, background: C.offwhite, fontFamily: F.b, fontSize: 14, color: C.licorice, outline: "none" }}
+                  />
+                  {isGeocoding && (
+                    <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: C.muted }}>⏳</span>
+                  )}
+                </div>
+                <span style={{ fontFamily: F.b, fontSize: 13, color: C.muted, alignSelf: "center" }}>
+                  Of klik op de kaart om een punt te kiezen.
+                </span>
+              </div>
+
+              {/* Kaart */}
+              <RadiusMap
+                center={centerCoords}
+                radius={radius}
+                onMapClick={(coords) => { setCenterCoords(coords); setLocationInput(""); }}
+                onRadiusChange={setRadius}
+              />
+
+              {locationInput && !isGeocoding && !centerCoords && (
+                <p style={{ fontFamily: F.b, fontSize: 13, color: C.red, marginTop: 8 }}>Locatie niet gevonden. Probeer een andere plaatsnaam.</p>
+              )}
+              {centerCoords && (
+                <p style={{ fontFamily: F.b, fontSize: 13, color: C.muted, marginTop: 8 }}>
+                  ✅ Zoekradius actief — vacatures binnen <strong>{radius} km</strong> worden getoond.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* RESULT COUNT */}
           <div style={{ fontFamily: F.b, fontSize: 14, color: C.muted, marginBottom: 24 }}>
-            {centerCoords && radiusInput && !jobCoordsReady
-              ? "Locaties ophalen..."
+            {centerCoords && !jobCoordsReady
+              ? "Locaties berekenen..."
               : filtered.length === 0
               ? "Geen vacatures gevonden"
-              : `${filtered.length} vacature${filtered.length !== 1 ? "s" : ""} gevonden${centerCoords && radiusInput ? ` binnen ${radius} km van ${radiusInput}` : ""}`}
+              : `${filtered.length} vacature${filtered.length !== 1 ? "s" : ""} gevonden${centerCoords ? ` binnen ${radius} km` : ""}`}
           </div>
 
           {/* GRID */}
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 40px", background: C.white, borderRadius: 16, border: `1px solid ${C.gainsboro}` }}>
-              <div style={{ fontFamily: F.h, fontSize: 28, fontWeight: 700, color: C.licorice, marginBottom: 16 }}>
-                Geen vacatures gevonden
-              </div>
+              <div style={{ fontFamily: F.h, fontSize: 28, fontWeight: 700, color: C.licorice, marginBottom: 16 }}>Geen vacatures gevonden</div>
               <p style={{ fontFamily: F.b, fontSize: 16, color: C.muted, maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.6 }}>
                 Pas je zoekopdracht aan of stuur ons een spontane sollicitatie.
               </p>
