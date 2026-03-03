@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function VacaturesPage() {
-  const jobs: Job[] = await getJobs();
+export default function VacaturesPage() {
+  const jobs: Job[] = getJobs();
 
   return (
     <div

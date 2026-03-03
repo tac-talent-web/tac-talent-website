@@ -9,7 +9,7 @@ import Link from "next/link";
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const jobs = await getJobs();
+  const jobs = getJobs();
   return jobs.map((job) => ({ slug: job.slug }));
 }
 
@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const job = await getJobBySlug(slug);
+  const job = getJobBySlug(slug);
   if (!job) return { title: "Vacature niet gevonden | TAC" };
 
   return {
@@ -84,7 +84,7 @@ export default async function VacatureDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const job = await getJobBySlug(slug);
+  const job = getJobBySlug(slug);
 
   if (!job) notFound();
 
